@@ -7,7 +7,8 @@ This is pytorch version of my bachelor's degree thesis. Applying tree based conv
 ## Usage
 Unzip algorithm file.
 
-    $ Unzip ./data/algorithms.pkl.zip
+    $ cd ./data
+    $ unzip algorithms.pkl.zip
 
 Load nodes and tree structures from algorithm pickle file.
 Nodes for vectorization. Trees for training and testing.
