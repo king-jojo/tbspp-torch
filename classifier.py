@@ -15,6 +15,7 @@ BATCH_SIZE = 1
 OUTPUT_SIZE1 = 240
 OUTPUT_SIZE2 = 120
 
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class tbspp(nn.Module):
 	def __init__(self, label_size):
@@ -174,6 +175,8 @@ def main():
     model = tbspp(label_size)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=LEARN_RATE)
+    
+    print("Waiting...")
     for epoch in range(1, EPOCHS+1):
         total_loss = 0.0
         dataset_size = 0
@@ -182,9 +185,12 @@ def main():
             nodes2vec = embeddings_new(torch.tensor(nodes, dtype=torch.long))
             children2tensor = torch.tensor(children, dtype=torch.long)
 
+            nodes2vec.to(DEVICE)
+            children2tensor.to(DEVICE)
+
             optimizer.zero_grad()
             out = model(nodes2vec, children2tensor)
-            loss = criterion(out, torch.tensor(label))
+            loss = criterion(out, torch.tensor(label, device=DEVICE))
             loss.backward()
             optimizer.step()
             total_loss += loss.item()
@@ -201,7 +207,9 @@ def main():
     		nodes, children, label = batch
     		nodes2vec = embeddings_new(torch.tensor(nodes, dtype=torch.long))
     		children2tensor = torch.tensor(children, dtype=torch.long)
-    		label = torch.tensor(label)
+    		label = torch.tensor(label, device=DEVICE)
+    		nodes2vec.to(DEVICE)
+    		children2tensor.to(DEVICE)
     		out = model(nodes2vec, children2tensor)
     		_, predicted = torch.max(out.data, 1)
     		total += label.size(0)

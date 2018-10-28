@@ -10,6 +10,8 @@ from tree_dataset import TreeDataSet
 from Anode2vec import EMBEDDING_DIM
 from classifier import tbspp
 
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 def main():
 	tbspp = torch.load('./data/tbspp.pth')
 	with open('./data/algorithm_trees.pkl', 'rb') as fh:
@@ -33,8 +35,9 @@ def main():
 		for batch in testdata.data_gen():
 			nodes, children, label = batch
 			nodes2vec = embeddings_new(torch.tensor(nodes, dtype=torch.long))
-			children2tensor = torch.tensor(children, dtype=torch.long)
-			label = torch.tensor(label)
+			nodes2vec.to(DEVICE)
+			children2tensor = torch.tensor(children, device=DEVICE, dtype=torch.long)
+			label = torch.tensor(label, device=DEVICE)
 			out = tbspp(nodes2vec, children2tensor)
 			_, predicted = torch.max(out.data, 1)
 			total += label.size(0)
