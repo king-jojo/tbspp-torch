@@ -2,7 +2,7 @@
 Author: king-jojo
 e-mail: zhenghuj@usc.edu
 
-This is pytorch version of my bachelor's degree thesis. Applying tree based convolution and pyramid pooling to classify defferent algorithms into defferent categories. 
+This is pytorch version code of my bachelor's degree thesis. Applying tree based convolution and pyramid pooling to classify defferent algorithms into defferent categories. 
 
 ## Usage
 Unzip algorithm file.
