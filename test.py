@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader, Dataset
 from tree_dataset import TreeDataSet
 from Anode2vec import EMBEDDING_DIM
 from classifier import tbspp
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -29,8 +30,10 @@ def main():
 	label_size = len(labels)
 	testdata = TreeDataSet(trees, labels, embed_lookup)
 
-	correct = 0
-	total = 0
+	# correct = 0
+	# total = 0
+	predict_list = []
+	correct_list = []
 	with torch.no_grad():
 		for batch in testdata.data_gen():
 			nodes, children, label = batch
@@ -40,9 +43,14 @@ def main():
 			label = torch.tensor(label, device=DEVICE)
 			out = tbspp(nodes2vec, children2tensor)
 			_, predicted = torch.max(out.data, 1)
-			total += label.size(0)
-			correct += (predicted == label).sum().item()
-	print('Accuracy of the tework on the testing data set is: %.3f %%' % (100* correct/total))
+			correct_list.append(label)
+			predict_list.append(predicted)
+	print('Accuracy:', accuracy_score(correct_list, predict_list))
+	print(classification_report(correct_list, predict_list, target_names=list(labels)))
+	print(confusion_matrix(correct_list, predict_list))
+			# total += label.size(0)
+			# correct += (predicted == label).sum().item()
+	# print('Accuracy of the tework on the testing data set is: %.3f %%' % (100* correct/total))
 
 if __name__ == '__main__':
 	main()
