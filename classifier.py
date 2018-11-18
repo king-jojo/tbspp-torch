@@ -1,3 +1,5 @@
+import time
+import math
 import ast
 import pickle
 import numpy as np
@@ -153,6 +155,13 @@ class tbspp(nn.Module):
 			   torch.mul((1.0 - c_t), (1.0 - c_r)), mask
 			)
 
+def timeSince(since):
+	now = time.time()
+	s = now - since
+	m = math.floor(s / 60)
+	s -= m * 60
+	return '%dm %ds' % (m, s)
+
 def main():
     input_tree = './data/algorithm_trees.pkl'
     input_embed = './data/vectors.pkl'
@@ -176,6 +185,7 @@ def main():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=LEARN_RATE)
     
+    start = time.time()
     print("Waiting...")
     for epoch in range(1, EPOCHS+1):
         total_loss = 0.0
@@ -195,7 +205,7 @@ def main():
             optimizer.step()
             total_loss += loss.item()
             dataset_size += 1
-        print('Epoch: %d/%d Loss: %.3f' % (epoch, EPOCHS, total_loss / dataset_size))
+        print('(%s) Epoch: %d/%d Loss: %.3f' % (timeSince(start), epoch, EPOCHS, total_loss / dataset_size))
 
     torch.save(model, './data/tbspp.pth')
     print('Model saved')

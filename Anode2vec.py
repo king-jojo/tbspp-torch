@@ -1,3 +1,5 @@
+import time
+import math
 import ast
 import pickle
 import torch
@@ -31,6 +33,13 @@ class Anode2vec(nn.Module):
 		x = self.linear3(x)
 		return self.embeddings, x
 
+def timeSince(since):
+	now = time.time()
+	s = now - since
+	m = math.floor(s / 60)
+	s -= m * 60
+	return '%dm %ds' % (m, s)
+
 def main():
 	infile = './data/algorithm_nodes.pkl'
 	outfile = './data/vectors.pkl'
@@ -47,6 +56,8 @@ def main():
 	model = Anode2vec()
 	optimizer = optim.SGD(model.parameters(), lr=LEARN_RATE)
 
+	start = time.time()
+	print("Waiting...")
 	for epoch in range(1, EPOCHS+1):
 		total_loss = 0
 		dataset_size = 0
@@ -62,7 +73,7 @@ def main():
 			optimizer.step()
 			total_loss += loss.item()
 			dataset_size += 1
-		print('Epoch: %d/%d Loss: %.3f' % (epoch, EPOCHS, total_loss / dataset_size))
+		print('(%s) Epoch: %d/%d Loss: %.3f' % (timeSince(start) ,epoch, EPOCHS, total_loss / dataset_size))
 	embed_file = open(outfile, 'wb')
 	pickle.dump((embed, NODE_MAP), embed_file)
 	print('Embedding saved.')
